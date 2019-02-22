@@ -61,26 +61,28 @@ public class PersonDAOTest {
         //passes then we know that our insert did put something in, and that it didn't change the
         //data in any way
         assertEquals(person, comparePerson);
-
     }
 
     @Test
-    public void insertFail() throws Exception {
+    public void insertFail() throws Exception
+    {
         //lets do this test again but this time lets try to make it fail
         boolean didItWork = true;
-        try {
-            Connection conn = db.openConnection();
-            EventDAO eDao = new EventDAO(conn);
+        try
+        {
+            PersonDAO pDAO = new PersonDAO(database.openConnection());
             //if we call the function the first time it will insert it successfully
-            eDao.insert(bestEvent);
+            pDAO.insert(person);
             //but our sql table is set up so that "eventID" must be unique. So trying to insert it
             //again will cause the function to throw an exception
-            eDao.insert(bestEvent);
-            db.closeConnection(didItWork);
-        } catch (DataAccessException e) {
+            pDAO.insert(person);
+            database.closeConnection(didItWork);
+        }
+        catch (DataAccessException e)
+        {
             //If we catch an exception we will end up in here, where we can change our boolean to
             //false to show that our function failed to perform correctly
-            db.closeConnection(false);
+            database.closeConnection(false);
             didItWork = false;
         }
         //Check to make sure that we did in fact enter our catch statement
@@ -89,20 +91,21 @@ public class PersonDAOTest {
         //rolled back. So for added security lets make one more quick check using our find function
         //to make sure that our event is not in the database
         //Set our compareTest to an actual event
-        Event compareTest = bestEvent;
-        try {
-            Connection conn = db.openConnection();
-            EventDAO eDao = new EventDAO(conn);
+        Person comparePerson = person;
+        try
+        {
+            PersonDAO pDAO = new PersonDAO(database.openConnection());
             //and then get something back from our find. If the event is not in the database we
             //should have just changed our compareTest to a null object
-            compareTest = eDao.find(bestEvent.getEventID());
-            db.closeConnection(true);
-        } catch (DataAccessException e) {
-            db.closeConnection(false);
+            comparePerson = pDAO.find(person.getPersonID());
+            database.closeConnection(true);
+        }
+        catch (DataAccessException e)
+        {
+            database.closeConnection(false);
         }
         //Now make sure that compareTest is indeed null
-        assertNull(compareTest);
-
+        assertNull(comparePerson);
     }
 
 }
