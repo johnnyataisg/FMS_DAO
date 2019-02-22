@@ -21,6 +21,48 @@ public class User
         this.personID = perID;
     }
 
+    public boolean equals(Object obj_2)
+    {
+        if (obj_2.getClass() != this.getClass())
+        {
+            return false;
+        }
+        else
+        {
+            User user_2 = (User)obj_2;
+
+            if (!this.username.equals(user_2.getUsername()))
+            {
+                return false;
+            }
+            if (!this.password.equals(user_2.getPassword()))
+            {
+                return false;
+            }
+            if (!this.email.equals(user_2.getEmail()))
+            {
+                return false;
+            }
+            if (!this.firstname.equals(user_2.getFirstname()))
+            {
+                return false;
+            }
+            if (!this.lastname.equals(user_2.getLastname()))
+            {
+                return false;
+            }
+            if (!this.gender.equals(user_2.getGender()))
+            {
+                return false;
+            }
+            if (!this.personID.equals(user_2.getPersonID()))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
     public String getUsername()
     {
         return this.username;

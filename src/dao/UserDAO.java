@@ -159,4 +159,50 @@ public class UserDAO
         }
         return commit;
     }
+
+    public boolean deleteUser(String username) throws DataAccessException
+    {
+        boolean commit = true;
+
+        ResultSet rs = null;
+        String sql = "SELECT * FROM Users WHERE Username = ?";
+        String sql2 = "DELETE FROM Users WHERE Username = ?";
+        try
+        {
+            PreparedStatement stmt = this.connection.prepareStatement(sql);
+            stmt.setString(1, username);
+            rs = stmt.executeQuery();
+
+            if (rs.next())
+            {
+                stmt = this.connection.prepareStatement(sql2);
+                stmt.setString(1, username);
+                stmt.executeUpdate();
+            }
+            else
+            {
+                throw new SQLException();
+            }
+        }
+        catch (SQLException e)
+        {
+            commit = false;
+            throw new DataAccessException("Error executing delete command");
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try
+                {
+                    rs.close();
+                }
+                catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return commit;
+    }
 }

@@ -116,4 +116,23 @@ public class PersonDAO
         }
         return commit;
     }
+
+    public int size() throws DataAccessException
+    {
+        String sql = "SELECT COUNT(*) FROM Persons";
+        ResultSet rs = null;
+
+        try
+        {
+            PreparedStatement stmt = this.connection.prepareStatement(sql);
+            rs = stmt.executeQuery();
+
+            int result = rs.getInt("COUNT(*)");
+            return result;
+        }
+        catch (SQLException e)
+        {
+            throw new DataAccessException("Error executing size command");
+        }
+    }
 }

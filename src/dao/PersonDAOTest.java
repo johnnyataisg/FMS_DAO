@@ -37,66 +37,51 @@ public class PersonDAOTest {
     public void insertPass() throws Exception
     {
         Person comparePerson = null;
-        //Let's clear the database as well so any lingering data doesn't affect our tests
         database.clearTables();
         try
         {
-            //Let's get our connection and make a new DAO
             PersonDAO pDAO = new PersonDAO(database.openConnection());
-            //While insert returns a bool we can't use that to verify that our function actually worked
-            //only that it ran without causing an error
             pDAO.insert(person);
-            //So lets use a find function to get the event that we just put in back out
-            comparePerson = pDAO.find(person.getPersonID());
+            comparePerson = pDAO.find("10101");
             database.closeConnection(true);
         }
         catch (DataAccessException e)
         {
             database.closeConnection(false);
         }
-        //First lets see if our find found anything at all. If it did then we know that if nothing
-        //else something was put into our database, since we cleared it in the beginning
         assertNotNull(comparePerson);
-        //Now lets make sure that what we put in is exactly the same as what we got out. If this
-        //passes then we know that our insert did put something in, and that it didn't change the
-        //data in any way
         assertEquals(person, comparePerson);
     }
 
     @Test
     public void insertFail() throws Exception
     {
-        //lets do this test again but this time lets try to make it fail
         boolean didItWork = true;
         try
         {
             PersonDAO pDAO = new PersonDAO(database.openConnection());
-            //if we call the function the first time it will insert it successfully
             pDAO.insert(person);
-            //but our sql table is set up so that "eventID" must be unique. So trying to insert it
-            //again will cause the function to throw an exception
-            pDAO.insert(person);
+            Person newPerson = new Person("10101",
+                    "hello world",
+                    "Drex",
+                    "Effect",
+                    "f",
+                    "Adam",
+                    "Eve",
+                    "");
+            pDAO.insert(newPerson);
             database.closeConnection(didItWork);
         }
         catch (DataAccessException e)
         {
-            //If we catch an exception we will end up in here, where we can change our boolean to
-            //false to show that our function failed to perform correctly
             database.closeConnection(false);
             didItWork = false;
         }
-        //Check to make sure that we did in fact enter our catch statement
         assertFalse(didItWork);
-        //Since we know our database encountered an error, both instances of insert should have been
-        //rolled back. So for added security lets make one more quick check using our find function
-        //to make sure that our event is not in the database
-        //Set our compareTest to an actual event
         Person comparePerson = person;
         try
         {
             PersonDAO pDAO = new PersonDAO(database.openConnection());
-            //and then get something back from our find. If the event is not in the database we
-            //should have just changed our compareTest to a null object
             comparePerson = pDAO.find(person.getPersonID());
             database.closeConnection(true);
         }
@@ -104,8 +89,94 @@ public class PersonDAOTest {
         {
             database.closeConnection(false);
         }
-        //Now make sure that compareTest is indeed null
         assertNull(comparePerson);
     }
 
+    @Test
+    public void findPass() throws Exception
+    {
+        Person findResult = null;
+        database.clearTables();
+        try
+        {
+            PersonDAO pDAO = new PersonDAO(database.openConnection());
+            pDAO.insert(person);
+            findResult = pDAO.find("10101");
+            database.closeConnection(true);
+        }
+        catch (DataAccessException e)
+        {
+            database.closeConnection(false);
+        }
+        assertNotNull(findResult);
+        assertEquals(person, findResult);
+    }
+
+    @Test
+    public void findFail() throws Exception
+    {
+        Person findResult = null;
+        database.clearTables();
+        try
+        {
+            PersonDAO pDAO = new PersonDAO(database.openConnection());
+            findResult = pDAO.find("10101");
+            database.closeConnection(true);
+        }
+        catch (DataAccessException e)
+        {
+            database.closeConnection(false);
+        }
+        assertNull(findResult);
+    }
+
+    @Test
+    public void clearPass() throws Exception
+    {
+        database.clearTables();
+        int size_after_insert = 0;
+        int size_after_clear = 0;
+        try
+        {
+            PersonDAO pDAO = new PersonDAO(database.openConnection());
+            pDAO.insert(person);
+            size_after_insert = pDAO.size();
+
+            pDAO.clearPersons();
+            size_after_clear = pDAO.size();
+
+            database.closeConnection(true);
+        }
+        catch (DataAccessException e)
+        {
+            database.closeConnection(false);
+        }
+        assertTrue(size_after_insert > 0 && size_after_clear == 0);
+    }
+
+    @Test
+    public void clearFail() throws Exception
+    {
+        database.clearTables();
+        int size_after_clear = 0;
+        int size_after_second_clear = 0;
+        try
+        {
+            PersonDAO pDAO = new PersonDAO(database.openConnection());
+            pDAO.insert(person);
+
+            pDAO.clearPersons();
+            size_after_clear = pDAO.size();
+
+            pDAO.clearPersons();
+            size_after_second_clear = pDAO.size();
+
+            database.closeConnection(true);
+        }
+        catch (DataAccessException e)
+        {
+            database.closeConnection(false);
+        }
+        assertTrue(size_after_clear == 0 && size_after_second_clear == 0);
+    }
 }

@@ -35,7 +35,6 @@ public class Database
 
             // Open a database connection to the file given in the path
             this.conn = DriverManager.getConnection(CONNECTION_URL);
-            System.out.println("Connection was successful");
 
             // Start a transaction
             this.conn.setAutoCommit(false);
